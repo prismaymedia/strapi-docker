@@ -1,0 +1,19 @@
+FROM node:20-alpine AS runner
+
+RUN apk add --no-cache libc6-compat tini
+
+WORKDIR /app
+
+COPY . /app/
+
+RUN npm install --production && \
+    npm run build
+
+ENV NODE_ENV=production
+ENV PORT=1337
+ENV HOST=0.0.0.0
+
+EXPOSE 1337
+
+ENTRYPOINT ["/sbin/tini", "--"]
+CMD ["node", "./node_modules/@strapi/strapi/bin/strapi.js", "start"]
